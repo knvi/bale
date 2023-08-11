@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/knvi/bale/pkg/cmd/root"
+	"github.com/knvi/bale/internal/cmd/root"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package root
 
 import (
-	"github.com/knvi/bale/pkg/cmd/version"
+	"github.com/knvi/bale/internal/cmd/version"
 	"github.com/spf13/cobra"
 )
 
