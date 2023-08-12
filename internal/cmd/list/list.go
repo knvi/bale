@@ -5,6 +5,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func formatFileTemplate(files []string) string {
+	var filesStr string
+
+	for _, file := range files {
+		filesStr += file + ", "
+	}
+
+	return filesStr
+}
+
 func CmdList() *cobra.Command{
 	cmd := &cobra.Command{
 		Use: "list",
@@ -16,7 +26,13 @@ func CmdList() *cobra.Command{
 			}
 
 			for _, tmpl := range tmpls {
-				cmd.Printf("- template %s located at %s\n", tmpl.Name, tmpl.Path)
+				if tmpl.Path != "" {
+					// dir template
+					cmd.Printf("- template \"%s\" located at %s\n", tmpl.Name, tmpl.Path)
+				} else {
+					// file template
+					cmd.Printf("- template \"%s\" with files %v\n", tmpl.Name, formatFileTemplate(tmpl.Files))
+				}
 			}
 		},
 	}
