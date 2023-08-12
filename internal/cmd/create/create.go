@@ -9,13 +9,15 @@ import (
 
 type CreateOpts struct {
 	Name string
+	FilesFlag bool
+	Files []string
 }
 
 func CmdCreate() *cobra.Command {
 	opts := &CreateOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "create [<name>]",
+		Use:   "create <name>",
 		Short: "Create a template",
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -27,10 +29,34 @@ func CmdCreate() *cobra.Command {
 				fmt.Println("Name is required")
 				return
 			}
+			
+			if opts.FilesFlag {
+				opts.Files = args[1:]
 
-			templater.CreateTemplate(opts.Name)
+				if len(opts.Files) == 0 {
+					fmt.Println("Files are required")
+					return
+				}
+
+				options := &templater.CreateOpts{
+					Name: opts.Name,
+					Files: opts.Files,
+				}
+
+				templater.CreateTemplate(options)
+
+				return
+			}
+
+			options := &templater.CreateOpts{
+				Name: opts.Name,
+			}
+
+			templater.CreateTemplate(options)
 		},
 	}
+
+	cmd.Flags().BoolVarP(&opts.FilesFlag, "files", "f", false, "Add files to template")
 
 	return cmd
 }

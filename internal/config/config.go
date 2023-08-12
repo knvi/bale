@@ -9,41 +9,46 @@ import (
 )
 
 type Template struct {
-	Path string `toml:"path"`
-	Name string `toml:"name"`
+	Path  string   `toml:"path"`
+	Name  string   `toml:"name"`
+	Files []string `toml:"files"`
 }
 
 type Config struct {
-	Templates []Template `toml:"templates"`
+	Templates []*Template `toml:"templates"`
 }
 
 func NewConfig() *Config {
-	return &Config{
-		Templates: make([]Template, 0),
-	}
+	return &Config{}
 }
 
-func (c *Config) AddTemplate(template Template) {
+func (c *Config) AddTemplate(template *Template) {
 	c.Templates = append(c.Templates, template)
 }
 
-func (c *Config) RemoveTemplate(template Template) {
-	for i, t := range c.Templates {
-		if t.Name == template.Name {
-			c.Templates = append(c.Templates[:i], c.Templates[i+1:]...)
-			break
-		}
-	}
-}
-
 func (c *Config) GetTemplate(name string) *Template {
-	for _, t := range c.Templates {
-		if t.Name == name {
-			return &t
+	for _, tmpl := range c.Templates {
+		if tmpl.Name == name {
+			return tmpl
 		}
 	}
 
 	return nil
+}
+
+func (c *Config) GetTemplates() []*Template {
+	return c.Templates
+}
+
+func (c *Config) DeleteTemplate(name string) error {
+	for i, tmpl := range c.Templates {
+		if tmpl.Name == name {
+			c.Templates = append(c.Templates[:i], c.Templates[i+1:]...)
+			return nil
+		}
+	}
+
+	return errors.New("template not found")
 }
 
 func (c *Config) Save() error {
@@ -92,6 +97,6 @@ func LoadConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &config, nil
 }

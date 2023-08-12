@@ -62,14 +62,18 @@ func CopyFile(src, dst string, overwrite bool) error {
 		return fmt.Errorf("destination directory %s does not exist", dst)
 	}
 
-	if exists, err := FileExists(dst); err != nil {
+	dstPath := filepath.Join(dst, filepath.Base(src))
+
+	fmt.Printf("Copying %s to %s\n", src, dstPath)
+
+	if exists, err := FileExists(dstPath); err != nil {
 		return err
 	} else if exists && !overwrite {
-		fmt.Printf("File %s already exists. Skipping...\n", dst)
+		fmt.Printf("File %s already exists. Skipping...\n", dstPath)
 		return nil
 	}
 
-	return copyFile(src, dst)
+	return copyFile(src, dstPath)
 }
 
 func copyFile(src, dst string) error {
