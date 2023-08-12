@@ -1,33 +1,26 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"errors"
+	"os"
+	"path/filepath"
+
+	"github.com/BurntSushi/toml"
 )
 
 type Template struct {
-	Path string
-	Name string
+	Path string `toml:"path"`
+	Name string `toml:"name"`
 }
 
 type Config struct {
-	Templates []Template
-	viper *viper.Viper
+	Templates []Template `toml:"templates"`
 }
 
-func NewConfig() (*Config, error) {
-	viper := viper.New()
-	viper.SetConfigName("bale")
-	viper.AddConfigPath("$HOME/.bale")
-	viper.SetConfigType("toml")
-
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
-	}
-
+func NewConfig() *Config {
 	return &Config{
-		Templates: []Template{},
-		viper: viper,
-	}, nil
+		Templates: make([]Template, 0),
+	}
 }
 
 func (c *Config) AddTemplate(template Template) {
@@ -54,22 +47,51 @@ func (c *Config) GetTemplate(name string) *Template {
 }
 
 func (c *Config) Save() error {
-	return c.viper.WriteConfig()
+	path, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	cfgDir := filepath.Join(path, ".config", "bale")
+	err = os.MkdirAll(cfgDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	cfgPath := filepath.Join(cfgDir, "bale.toml")
+	f, err := os.Create(cfgPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	err = toml.NewEncoder(f).Encode(c)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("bale")
-	viper.AddConfigPath("$HOME/.bale")
-	viper.SetConfigType("toml")
+	path, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
 
-	if err := viper.ReadInConfig(); err != nil {
+	cfgPath := filepath.Join(path, ".config", "bale", "bale.toml")
+	_, err = os.Stat(cfgPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return NewConfig(), nil
+	} else if err != nil {
 		return nil, err
 	}
 
 	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
+	_, err = toml.DecodeFile(cfgPath, &config)
+	if err != nil {
 		return nil, err
 	}
-
+	
 	return &config, nil
 }
