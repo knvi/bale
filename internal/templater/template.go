@@ -64,6 +64,6 @@ func DeployTemplate(name string) {
 	fmt.Println("From", tmpl.Path)
 	fmt.Println("To", path)
 
-	osutil.CopyFromTo(tmpl.Path, path, false)
+	osutil.CopyFiles(tmpl.Path, path, false)
 
 }
