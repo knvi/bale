@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gookit/color"
 	"github.com/knvi/bale/internal/config"
 	"github.com/knvi/bale/internal/osutil"
 )
@@ -47,7 +48,7 @@ func CreateTemplate(opts *CreateOpts) {
 			os.Exit(1)
 		}
 
-		fmt.Fprintf(os.Stdout, "Created template %s\n", opts.Name)
+		fmt.Fprintf(os.Stdout, "🚀 Created template %s!\n", opts.Name)
 
 	} else {
 		// files means that the template is a file template
@@ -77,7 +78,7 @@ func CreateTemplate(opts *CreateOpts) {
 			os.Exit(1)
 		}
 
-		fmt.Fprintf(os.Stdout, "Created template %s\n", opts.Name)
+		color.LightGreen.Printf("🚀 Created template %s!\n", opts.Name)
 	}
 }
 
@@ -100,9 +101,7 @@ func DeployTemplate(name string) {
 		os.Exit(1)
 	}
 
-	fmt.Println("Deploying template", tmpl.Name)
-	fmt.Println("From", tmpl.Path)
-	fmt.Println("To", path)
+	fmt.Printf("Deploying template %s", tmpl.Name)
 
 	if tmpl.Files == nil {
 		// dir template
@@ -117,6 +116,8 @@ func DeployTemplate(name string) {
 			}
 		}
 	}
+
+	color.LightGreen.Println("🚀 Done!")
 
 }
 
@@ -148,5 +149,5 @@ func DeleteTemplate(name string) {
 		os.Exit(1)
 	}
 
-	fmt.Fprintf(os.Stdout, "Deleted template %s\n", name)
+	color.LightGreen.Printf("🚀 Deleted template %s!\n", name)
 }
